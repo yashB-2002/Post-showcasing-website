@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Listing</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Post Portal ✈️</h1>
+        <input type="text" id="search-input" placeholder="Search here...">
+    </header>
+    <div id="pagination" class="pagination">
+        <button id="prev-btn" disabled>Prev</button>
+        <span id="page-info">Page 1</span>
+        <button id="next-btn">Next</button>
+    </div>
+    <div id="post-container" class="post-list"></div>
+    
+    <div id="pagination-anchor"></div>
+    <script src="js/apiService.js"></script>
+    <script src="js/pagination.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

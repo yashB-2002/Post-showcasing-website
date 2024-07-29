@@ -1,0 +1,146 @@
+@import url('https://fonts.googleapis.com/css2?family=Merriweather+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Merriweather Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #90AEAD;
+}
+
+header {
+    text-align: center;
+    margin: 20px;
+    width: 100%;
+    background-color: #244855;
+    color: white;
+    padding: 20px 0;
+}
+
+#search-input {
+    width: 50%;
+    outline: none;
+    padding: 10px;
+    margin: 20px 0;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.post-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+}
+
+.post {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: white;
+    margin: 10px;
+    padding: 10px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.post img {
+    width: 100%;
+    height: auto;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 10px;
+}
+
+.post h3 {
+    color: #244855;
+}
+
+.post p {
+    margin-top: 0.6em;
+    color: #555;
+}
+
+.post .more-details {
+    display: block;
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #244855;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.read-more {
+    font-weight: 900;
+    color: #E64833;
+    cursor: pointer;
+}
+
+.read-more:hover {
+    color: #6b352e;
+    transition: all 0.2s;
+}
+
+.post .more-details:hover {
+    background-color: #E64833;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px;
+    width: 100%;
+}
+
+.pagination button {
+    margin: 0 5px;
+    padding: 10px 20px;
+    border: none;
+    background-color: #E64833;
+    color: white;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.pagination button:disabled {
+    background-color: #cccccc;
+}
+
+.pagination button:hover:not(:disabled) {
+    background-color: #E64833;
+}
+
+.pagination span {
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    color: #EDE8F5;
+}
+
+.pagination .active {
+    background-color: #244855;
+}
+
+@media (max-width: 768px) {
+    .post {
+        width: 100%;
+        margin: 10px 0;
+    }
+
+    #search-input {
+        width: 90%;
+    }
+}
+
