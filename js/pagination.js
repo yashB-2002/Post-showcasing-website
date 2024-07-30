@@ -16,9 +16,12 @@ class Pagination {
         this.currentPage = page;
         this.updatePageInfo();
         this.renderPaginationButtons();
-        this.scrollToActiveButton(); // Ensure the active button is in view
+        this.scrollToActiveButton(); // to make active button in view
+        main.scrollToPagePosition(page); // to scroll to saved position
     }
 
+
+    // adding event listeners on the next and prev
     addEventListeners() {
         const paginationContainer = document.getElementById('pagination');
         paginationContainer.addEventListener('click', (event) => {
@@ -43,6 +46,7 @@ class Pagination {
         const pageButtonsContainer = document.getElementById('page-buttons');
         pageButtonsContainer.innerHTML = '';
 
+        // dynamically generate the buttons
         for (let i = 1; i <= this.totalPages; i++) {
             const pageButton = document.createElement('button');
             pageButton.className = 'page-btn';
@@ -59,6 +63,7 @@ class Pagination {
         }
     }
 
+    // scrolling to active button to handle the horizontal scrollabr position according to the user's view
     scrollToActiveButton() {
         const activeButton = document.querySelector('.page-btn.active');
         if (activeButton) {

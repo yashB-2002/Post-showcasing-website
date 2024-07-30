@@ -3,6 +3,7 @@ class Main {
         this.data = [];
         this.isLoading = false;
         this.hasMore = true;
+        this.pagePositions = new Map();
     }
 
     async fetchAndDisplayPosts(page, limit = 10, searchQuery = '') {
@@ -14,30 +15,23 @@ class Main {
         this.hasMore = data.posts.length > 0;
     }
 
+    // displaypost on page
     displayPosts() {
-        const searchQuery = document.getElementById('search-input').value;
+        const searchQuery = document.getElementById(commonID.searchInput).value;
         const filteredPosts = this.data.posts.filter(post =>
             post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             post.body.toLowerCase().includes(searchQuery.toLowerCase())
         );
 
-        const postContainer = document.getElementById('post-container');
+        const postContainer = document.getElementById(commonID.postContainer);
 
         filteredPosts.forEach(post => {
-            const postDiv = document.createElement('div');
-            postDiv.className = 'post';
-            postDiv.innerHTML = `
-                <img src="https://via.placeholder.com/300x150" alt="Post Image">
-                <h3>${post.title}</h3>
-                <p>${post.body.substring(0, 100)}... <span class="read-more">See More</span></p>
-                <p><strong>Views:</strong> ${post.views}</p>
-                <p><strong>Likes:</strong> ${post.reactions.likes} --- <strong>Dislikes:</strong> ${post.reactions.dislikes}</p>
-                <a href="#" class="more-details">More Details</a>
-            `;
+            const postDiv = createElement('div', 'post');
+            postDiv.innerHTML = createPostHTML(post);
             postContainer.appendChild(postDiv);
 
             const readMore = postDiv.querySelector('.read-more');
-            readMore.addEventListener('click', () => {
+            addEventListener(readMore, 'click', () => {
                 readMore.parentElement.innerText = post.body;
             });
         });
@@ -46,32 +40,30 @@ class Main {
     }
 
     async loadPosts() {
-        console.trace('lodingposrt')
-        const searchQuery = document.getElementById('search-input').value;
+        const searchQuery = document.getElementById(commonID.searchInput).value;
         await this.fetchAndDisplayPosts(pagination.currentPage, 10, searchQuery); 
     }
 
     infiniteScroller() {
-        const postContainer = document.getElementById('post-container');
-        const pagePositions = new Map(); 
-        let lastScrollTop = 0; 
-    
+        const postContainer = document.getElementById(commonID.postContainer);
+        let lastScrollTop = 0;
+
         postContainer.addEventListener('scroll', (event) => {
             let { clientHeight, scrollHeight, scrollTop } = event.target;
-    
-            if (!pagePositions.has(pagination.currentPage)) {
-                pagePositions.set(pagination.currentPage, scrollTop);
+
+            if (!this.pagePositions.has(pagination.currentPage)) {
+                this.pagePositions.set(pagination.currentPage, scrollTop);
             }
-    
+
             let currentPage = pagination.currentPage;
-            for (let [page, position] of pagePositions.entries()) {
+            for (let [page, position] of this.pagePositions.entries()) {
                 if (scrollTop >= position) {
                     currentPage = page;
                 } else {
                     break;
                 }
             }
-    
+
             if (!this.isLoading && this.hasMore) {
                 // Forward scrolling logic
                 if (scrollTop > lastScrollTop && clientHeight + scrollTop >= scrollHeight - 1) {
@@ -79,32 +71,23 @@ class Main {
                     this.loadPosts();
                 }
             }
-    
+
             // Backward scrolling logic
             if (scrollTop < lastScrollTop) {
                 if (pagination.currentPage !== currentPage) {
                     pagination.setPage(currentPage);
-                    // alert('success')
-                    // const pageButtonsContainer = document.getElementById('page-buttons');
-                    // const buttons = pageButtonsContainer.getElementsByClassName('page-btn');
-
-                    // for (const button of buttons) {
-                    //     button.classList.remove('active');
-                    //     if (parseInt(button.dataset.page, 10) === pagination.currentPage) {
-                    //         button.classList.add('active');
-                    //     }
-                    // }
-                    this.updateUIForCurrentPage(pagination.currentPage)
+                    this.updateUIForCurrentPage(pagination.currentPage);
                 }
             }
-    
+
+            // updating the scroll top position
             lastScrollTop = scrollTop;
         });
     }
 
+    // updating the button state ie. active or not
     updateUIForCurrentPage(page) {
-        // Implement the logic to update the UI based on the current page
-        const pageButtonsContainer = document.getElementById('page-buttons');
+        const pageButtonsContainer = document.getElementById(commonID.pageButtons);
         const buttons = pageButtonsContainer.getElementsByClassName('page-btn');
 
         for (const button of buttons) {
@@ -114,10 +97,21 @@ class Main {
             }
         }
     }
-    
+
+    // this is for changing the scrolltip postion according to the currentpage position
+    scrollToPagePosition(page) {
+        const postContainer = document.getElementById(commonID.postContainer);
+        if (this.pagePositions.has(page)) {
+            const position = this.pagePositions.get(page);
+            postContainer.scrollTo({
+                top: position,
+                behavior: 'smooth'
+            });
+        }
+    }
 
     init() {
-        document.getElementById('search-input').addEventListener('input', () => this.loadPosts());
+        addEventListener(document.getElementById(commonID.searchInput), 'input', () => this.loadPosts());
         this.loadPosts();
         this.infiniteScroller();
     }
@@ -125,4 +119,3 @@ class Main {
 
 const main = new Main();
 main.init();
-
