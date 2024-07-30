@@ -1,43 +1,29 @@
-// to rate limit the api calls
-function throttle(fn, wait) {
-    let timeout = null;
-    return function (...args) {
-        if (!timeout) {
-            timeout = setTimeout(() => {
-                fn.apply(this, args);
-                timeout = null;
-            }, wait);
-        }
-    };
-}
 class Main {
-    // Store fetched data here
-    data = [];
-    isLoading = false; // Track if data is currently being loaded
-    hasMore= true;  // Flag to determine if there's more data to load
-
-    async fetchAndDisplayPosts(page, searchQuery = '') {
-
-        this.isLoading = true;
-        const data = await apiService.fetchPosts(page, 10, searchQuery);
+    constructor() {
+        this.data = [];
         this.isLoading = false;
-        this.data = data;
-        this.displayPosts();
-        this.hasMore = data.posts.length > 0; 
+        this.hasMore = true;
+        this.limit = 10;
     }
 
+    async fetchAndDisplayPosts(page, limit = 10, searchQuery = '') {
+        this.isLoading = true;
+        const data = await apiService.fetchPosts(page, limit, searchQuery);
+        this.isLoading = false;
+        this.data = data;
+        this.displayPosts(this.limit);
+        this.hasMore = data.posts.length > 0;
+    }
 
-    
-    displayPosts() {
+    displayPosts(limit) {
         const searchQuery = document.getElementById('search-input').value;
         const filteredPosts = this.data.posts.filter(post =>
             post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             post.body.toLowerCase().includes(searchQuery.toLowerCase())
         );
 
-        const postContainer = document.getElementById('post-container'); // post container to hold all the posts        
+        const postContainer = document.getElementById('post-container');
 
-        // this code for implementing the search query
         filteredPosts.forEach(post => {
             const postDiv = document.createElement('div');
             postDiv.className = 'post';
@@ -57,59 +43,43 @@ class Main {
             });
         });
 
-        // this is for calculating the total pages to hold all the data and initialize the pagination component with the initial values
-        pagination.init(Math.ceil(this.data.total / 10));
+        pagination.init(Math.ceil(this.data.total / limit));
     }
 
-    // to call the display post for current page
     async loadPosts() {
         const searchQuery = document.getElementById('search-input').value;
-        await this.fetchAndDisplayPosts(pagination.currentPage, searchQuery);
+        const limit = parseInt(document.getElementById("pageLimit").value,10)
+        await this.fetchAndDisplayPosts(pagination.currentPage, limit, searchQuery); // Limit set to 10 per page
     }
 
     infiniteScroller() {
-        window.addEventListener('scroll', throttle(() => {
-            if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 200) {
-                
-                // loading of new post is done when the tootltip is near the bottom not exactly touched
-                if (!this.isLoading && this.hasMore) {
+        const postContainer = document.getElementById('post-container');
+        postContainer.addEventListener('scroll', (event) => {
+            let { clientHeight, scrollHeight, scrollTop } = event.target;
+            const pageHeight = scrollHeight / pagination.getCuurentPage();
+            const currentPage = Math.floor(scrollTop / pageHeight) + 1;
+
+            // console.log(clientHeight,scrollHeight,scrollTop,pagination.getCuurentPage());
+            if (!this.isLoading && this.hasMore) {
+                // Forward scrolling logic
+                if (clientHeight + scrollTop >= scrollHeight - 1) {
                     pagination.setPage(pagination.currentPage + 1);
-                    this.loadPosts(); 
+                    this.loadPosts();
                 }
+                // Backward scrolling logic
+                else if (scrollTop +clientHeight <= pageHeight * (pagination.currentPage - 1) && pagination.currentPage !== currentPage) {
+                    pagination.setPage(currentPage);
+                } 
             }
-        }, 300)); 
+        });
     }
 
     init() {
+        document.getElementById('search-input').addEventListener('input', () => this.loadPosts());
         this.loadPosts();
-        const searchInput = document.getElementById('search-input');
-        searchInput.addEventListener('input', throttle(() => {
-            pagination.setPage(1); // when search input is called page is set to 1 as searching is done page wise
-            this.loadPosts();
-        }, 300)); 
-
         this.infiniteScroller();
-
-        // Initialize pagination buttons
-        document.getElementById('prev-btn').addEventListener('click', () => {
-            if (pagination.currentPage > 1) {
-                pagination.setPage(pagination.currentPage - 1);
-                this.loadPosts();
-            }
-        });
-
-        document.getElementById('next-btn').addEventListener('click', () => {
-            if (pagination.currentPage < pagination.totalPages) {
-                pagination.setPage(pagination.currentPage + 1);
-                this.loadPosts();
-            }
-        });
     }
-};
+}
 
-// Execute when all the content in the DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    new Main().init();
-});
-
-const main = new Main()
+const main = new Main();
+main.init();
