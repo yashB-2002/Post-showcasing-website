@@ -3,7 +3,6 @@ class Main {
         this.data = [];
         this.isLoading = false;
         this.hasMore = true;
-        this.limit = 10;
     }
 
     async fetchAndDisplayPosts(page, limit = 10, searchQuery = '') {
@@ -11,11 +10,11 @@ class Main {
         const data = await apiService.fetchPosts(page, limit, searchQuery);
         this.isLoading = false;
         this.data = data;
-        this.displayPosts(this.limit);
+        this.displayPosts();
         this.hasMore = data.posts.length > 0;
     }
 
-    displayPosts(limit) {
+    displayPosts() {
         const searchQuery = document.getElementById('search-input').value;
         const filteredPosts = this.data.posts.filter(post =>
             post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -43,36 +42,79 @@ class Main {
             });
         });
 
-        pagination.init(Math.ceil(this.data.total / limit));
+        pagination.init(Math.ceil(this.data.total / 10));
     }
 
     async loadPosts() {
+        console.trace('lodingposrt')
         const searchQuery = document.getElementById('search-input').value;
-        const limit = parseInt(document.getElementById("pageLimit").value,10)
-        await this.fetchAndDisplayPosts(pagination.currentPage, limit, searchQuery); // Limit set to 10 per page
+        await this.fetchAndDisplayPosts(pagination.currentPage, 10, searchQuery); 
     }
 
     infiniteScroller() {
         const postContainer = document.getElementById('post-container');
+        const pagePositions = new Map(); 
+        let lastScrollTop = 0; 
+    
         postContainer.addEventListener('scroll', (event) => {
             let { clientHeight, scrollHeight, scrollTop } = event.target;
-            const pageHeight = scrollHeight / pagination.getCuurentPage();
-            const currentPage = Math.floor(scrollTop / pageHeight) + 1;
-
-            // console.log(clientHeight,scrollHeight,scrollTop,pagination.getCuurentPage());
+    
+            if (!pagePositions.has(pagination.currentPage)) {
+                pagePositions.set(pagination.currentPage, scrollTop);
+            }
+    
+            let currentPage = pagination.currentPage;
+            for (let [page, position] of pagePositions.entries()) {
+                if (scrollTop >= position) {
+                    currentPage = page;
+                } else {
+                    break;
+                }
+            }
+    
             if (!this.isLoading && this.hasMore) {
                 // Forward scrolling logic
-                if (clientHeight + scrollTop >= scrollHeight - 1) {
+                if (scrollTop > lastScrollTop && clientHeight + scrollTop >= scrollHeight - 1) {
                     pagination.setPage(pagination.currentPage + 1);
                     this.loadPosts();
                 }
-                // Backward scrolling logic
-                else if (scrollTop +clientHeight <= pageHeight * (pagination.currentPage - 1) && pagination.currentPage !== currentPage) {
-                    pagination.setPage(currentPage);
-                } 
             }
+    
+            // Backward scrolling logic
+            if (scrollTop < lastScrollTop) {
+                if (pagination.currentPage !== currentPage) {
+                    pagination.setPage(currentPage);
+                    // alert('success')
+                    // const pageButtonsContainer = document.getElementById('page-buttons');
+                    // const buttons = pageButtonsContainer.getElementsByClassName('page-btn');
+
+                    // for (const button of buttons) {
+                    //     button.classList.remove('active');
+                    //     if (parseInt(button.dataset.page, 10) === pagination.currentPage) {
+                    //         button.classList.add('active');
+                    //     }
+                    // }
+                    this.updateUIForCurrentPage(pagination.currentPage)
+                }
+            }
+    
+            lastScrollTop = scrollTop;
         });
     }
+
+    updateUIForCurrentPage(page) {
+        // Implement the logic to update the UI based on the current page
+        const pageButtonsContainer = document.getElementById('page-buttons');
+        const buttons = pageButtonsContainer.getElementsByClassName('page-btn');
+
+        for (const button of buttons) {
+            button.classList.remove('active');
+            if (parseInt(button.dataset.page, 10) === page) {
+                button.classList.add('active');
+            }
+        }
+    }
+    
 
     init() {
         document.getElementById('search-input').addEventListener('input', () => this.loadPosts());
@@ -83,3 +125,4 @@ class Main {
 
 const main = new Main();
 main.init();
+

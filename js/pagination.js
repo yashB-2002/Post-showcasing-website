@@ -15,21 +15,20 @@ class Pagination {
         if (page > this.totalPages) page = this.totalPages;
         this.currentPage = page;
         this.updatePageInfo();
-        main.loadPosts();
+        this.renderPaginationButtons();
+        this.scrollToActiveButton(); // Ensure the active button is in view
     }
 
-    getCuurentPage() {
-        return this.currentPage
-    }
     addEventListeners() {
         const paginationContainer = document.getElementById('pagination');
         paginationContainer.addEventListener('click', (event) => {
             if (event.target.id === 'prev-btn') {
                 this.setPage(this.currentPage - 1);
-                
+                main.loadPosts();
             }
             if (event.target.id === 'next-btn') {
                 this.setPage(this.currentPage + 1);
+                main.loadPosts();
             }
         });
     }
@@ -52,7 +51,18 @@ class Pagination {
             if (i === this.currentPage) {
                 pageButton.classList.add('active');
             }
+            pageButton.addEventListener('click', () => {
+                this.setPage(i);
+                main.loadPosts();
+            });
             pageButtonsContainer.appendChild(pageButton);
+        }
+    }
+
+    scrollToActiveButton() {
+        const activeButton = document.querySelector('.page-btn.active');
+        if (activeButton) {
+            activeButton.scrollIntoView({ behavior: 'smooth', inline: 'center' });
         }
     }
 }
