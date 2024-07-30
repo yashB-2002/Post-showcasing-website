@@ -4,18 +4,23 @@ class Main {
         this.isLoading = false;
         this.hasMore = true;
         this.pagePositions = new Map();
+        this.limit = 10; // default limit
     }
 
-    async fetchAndDisplayPosts(page, limit = 10, searchQuery = '') {
+    async fetchAndDisplayPosts(page, searchQuery = '') {
         this.isLoading = true;
-        const data = await apiService.fetchPosts(page, limit, searchQuery);
+        console.log(`Fetching posts: page=${page}, limit=${this.limit}, searchQuery=${searchQuery}`);
+        console.log(`length of data is ${this.data.length}`);
+
+        // Fetching posts with current limit
+        const data = await apiService.fetchPosts(page, this.limit, searchQuery);
         this.isLoading = false;
-        this.data = data;
+        this.data = data; // Update data with new fetched posts
         this.displayPosts();
         this.hasMore = data.posts.length > 0;
+        pagination.updateTotalPages(data.total); // Updating pagination with new total pages
     }
 
-    // displaypost on page
     displayPosts() {
         const searchQuery = document.getElementById(commonID.searchInput).value;
         const filteredPosts = this.data.posts.filter(post =>
@@ -31,17 +36,17 @@ class Main {
             postContainer.appendChild(postDiv);
 
             const readMore = postDiv.querySelector('.read-more');
-            addEventListener(readMore, 'click', () => {
-                readMore.parentElement.innerText = post.body;
-            });
+            if (readMore) {
+                addEventListener(readMore, 'click', () => {
+                    readMore.parentElement.innerText = post.body;
+                });
+            }
         });
-
-        pagination.init(Math.ceil(this.data.total / 10));
     }
 
     async loadPosts() {
         const searchQuery = document.getElementById(commonID.searchInput).value;
-        await this.fetchAndDisplayPosts(pagination.currentPage, 10, searchQuery); 
+        await this.fetchAndDisplayPosts(pagination.currentPage, searchQuery); 
     }
 
     infiniteScroller() {
@@ -85,7 +90,6 @@ class Main {
         });
     }
 
-    // updating the button state ie. active or not
     updateUIForCurrentPage(page) {
         const pageButtonsContainer = document.getElementById(commonID.pageButtons);
         const buttons = pageButtonsContainer.getElementsByClassName('page-btn');
@@ -98,7 +102,6 @@ class Main {
         }
     }
 
-    // this is for changing the scrolltip postion according to the currentpage position
     scrollToPagePosition(page) {
         const postContainer = document.getElementById(commonID.postContainer);
         if (this.pagePositions.has(page)) {
@@ -111,6 +114,16 @@ class Main {
     }
 
     init() {
+        // Listen for changes to the page limit
+        document.getElementById('pageLimit').addEventListener('change', (event) => {
+            this.limit = parseInt(event.target.value, 10);
+            console.log(`Page limit changed to ${this.limit}`);
+            // this.pagePositions.clear(); 
+            pagination.setPage(1); // Reset to first page
+            // this.data = [];
+            this.loadPosts(); // Reload posts with new limit
+        });
+
         addEventListener(document.getElementById(commonID.searchInput), 'input', () => this.loadPosts());
         this.loadPosts();
         this.infiniteScroller();

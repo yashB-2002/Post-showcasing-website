@@ -2,6 +2,7 @@ class Pagination {
     constructor() {
         this.currentPage = 1;
         this.totalPages = 1;
+        this.limit = 10; // Default limit
         this.addEventListeners();
     }
 
@@ -20,8 +21,13 @@ class Pagination {
         main.scrollToPagePosition(page); // to scroll to saved position
     }
 
+    // Method to update pagination based on new limit
+    updateTotalPages(totalRecords) {
+        this.totalPages = Math.ceil(totalRecords / this.limit);
+        this.renderPaginationButtons();
+        this.updatePageInfo();
+    }
 
-    // adding event listeners on the next and prev
     addEventListeners() {
         const paginationContainer = document.getElementById('pagination');
         paginationContainer.addEventListener('click', (event) => {
@@ -34,12 +40,16 @@ class Pagination {
                 main.loadPosts();
             }
         });
+
+        // Add event listener for page limit dropdown change
+        document.getElementById('pageLimit').addEventListener('change', (event) => {
+            this.limit = parseInt(event.target.value, 10);
+            main.loadPosts(); // Reload posts with the new limit
+        });
     }
 
-    init(totalPages) {
-        this.totalPages = totalPages;
-        this.renderPaginationButtons();
-        this.updatePageInfo();
+    init(totalRecords) {
+        this.updateTotalPages(totalRecords);
     }
 
     renderPaginationButtons() {
