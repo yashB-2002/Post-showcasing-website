@@ -11,7 +11,7 @@ class Main {
         this.isLoading = true;
         console.log(`Fetching posts: page=${page}, limit=${this.limit}, searchQuery=${searchQuery}`);
         console.log(`length of data is ${this.data.length}`);
-
+        console.trace()
         // Fetching posts with current limit
         const data = await apiService.fetchPosts(page, this.limit, searchQuery);
         this.isLoading = false;
@@ -74,7 +74,9 @@ class Main {
                 if (scrollTop > lastScrollTop && clientHeight + scrollTop >= scrollHeight - 1) {
                     pagination.setPage(pagination.currentPage + 1);
                     this.loadPosts();
+
                 }
+                
             }
 
             // Backward scrolling logic
@@ -118,9 +120,9 @@ class Main {
         document.getElementById('pageLimit').addEventListener('change', (event) => {
             this.limit = parseInt(event.target.value, 10);
             console.log(`Page limit changed to ${this.limit}`);
-            // this.pagePositions.clear(); 
-            pagination.setPage(1); // Reset to first page
-            // this.data = [];
+            this.pagePositions.clear(); 
+            pagination.setPage(1); 
+            document.getElementById("post-container").innerHTML = '' // before loading post with new limit clear the post with previous meeting
             this.loadPosts(); // Reload posts with new limit
         });
 
