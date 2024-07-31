@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Listing</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Post Portal ✈️</h1>
+        <input type="text" id="search-input" placeholder="Search here...">
+    </header>
+    
+    <div id="post-container" class="post-list"></div>
+    <div id="pagination" class="pagination">
+        <button id="prev-btn" disabled>Prev</button>
+        <div id="page-buttons"></div>
+        <button id="next-btn">Next</button>
+        <label for="pageLimit" class="pagination__page-limit-label">Items per page:</label>
+        <select id="pageLimit" class="pagination__page-limit-select">
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+        </select>
+    </div>
+    <script src="js/BaseApiService.js"></script>
+    <script src="js/apiService.js"></script>
+    <script src="js/pagination.js"></script>
+    <script src="js/util.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

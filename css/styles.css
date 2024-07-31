@@ -1,0 +1,253 @@
+@import url('https://fonts.googleapis.com/css2?family=Merriweather+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+:root {
+    --color-primary: #E64833;
+    --color-secondary: #244855;
+    --color-text-primary: #555;
+    --color-background: white;
+    --color-border: #ddd;
+    --color-disabled: #cccccc;
+    --color-hover: #6b352e;
+    --color-shadow: rgba(0, 0, 0, 0.1);
+    --color-info: #EDE8F5;
+}
+
+body {
+    font-family: "Merriweather Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    align-items: center;
+    background-color: #90AEAD;
+}
+
+header {
+    text-align: center;
+    margin: 20px;
+    width: 100%;
+    background-color: var(--color-secondary);
+    color: var(--color-background);
+    padding: 20px 0;
+}
+
+#search-input {
+    width: 50%;
+    outline: none;
+    padding: 10px;
+    margin: 20px 0;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px var(--color-shadow);
+}
+
+.post-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    height: calc(100vh-300px);
+    overflow: auto;
+}
+
+.post {
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    background-color: var(--color-background);
+    margin: 10px;
+    padding: 10px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 2px 5px var(--color-shadow);
+}
+
+.post img {
+    width: 100%;
+    height: auto;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 10px;
+}
+
+.post h3 {
+    color: var(--color-secondary);
+}
+
+.post p {
+    margin-top: 0.6em;
+    color: #555;
+}
+
+.post .more-details {
+    display: block;
+    margin-top: 10px;
+    padding: 10px;
+    background-color: var(--color-secondary);
+    color: var(--color-background);
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.read-more {
+    font-weight: 900;
+    color: var(--color-primary);
+    cursor: pointer;
+}
+
+.read-more:hover {
+    color: var(--color-hover);
+    transition: all 0.2s;
+}
+
+.post .more-details:hover {
+    background-color: var(--color-primary);
+}
+
+/* Add necessary styles for the buttons */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: calc(100vw - 700px);
+    padding: 10px;
+}
+
+#page-buttons {
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+    
+    max-width: 80%;
+    padding: 10px;
+    gap: 10px;
+    margin: 4px 7px;
+}
+
+.page-btn {
+    padding: 10px 20px;
+    border: none;
+    background-color: var(--color-primary);
+    color: var(--color-background);
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+
+    text-align: center;
+}
+
+.page-btn.active {
+    background-color: var(--color-secondary);
+}
+
+button#prev-btn, button#next-btn {
+    padding: 10px 20px;
+    border: none;
+    background-color: #3498db;
+    color: var(--color-background);
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.pagination button:disabled {
+    background-color: var(--color-disabled);
+}
+
+.pagination button:hover:not(:disabled) {
+    background-color: var(--color-primary);
+}
+
+.page-limit-label {
+    margin-left: 10px;
+    font-size: 8px;
+}
+
+.pagination__page-limit-select {
+    margin-left: 5px;
+    padding: 5px;
+    font-size: 16px;
+}
+.pagination__pagination .active {
+    background-color: var(--color-secondary);
+}
+
+@media (max-width: 768px) {
+    .post {
+        width: 100%;
+        margin: 10px 0;
+    }
+
+    #search-input {
+        width: 90%;
+    }
+    .pagination {
+        display: flex;
+        align-items: center;
+        width: 100vw;
+        padding: 10px;
+    }
+    
+    #page-buttons {
+        display: flex;
+        align-items: center;
+        overflow-x: auto;
+        
+        max-width: 80%;
+        padding: 10px;
+        gap: 10px;
+        margin: 4px 7px;
+    }
+    
+    .page-btn {
+        padding: 10px 20px;
+        border: none;
+        background-color: #e74c3c;
+        color: var(--color-background);
+        border-radius: 5px;
+        text-align: center;
+        cursor: pointer;
+    
+        text-align: center;
+    }
+    
+}
+
+
+@media screen and (min-width: 769px) and (max-width:1000px) {
+    
+    .pagination {
+        display: flex;
+        align-items: center;
+        width: 100vw;
+        padding: 10px;
+    }
+    
+    #page-buttons {
+        display: flex;
+        align-items: center;
+        overflow-x: auto;
+        padding: 10px;
+        gap: 10px;
+        margin: 4px 7px;
+    }
+    
+    .page-btn {
+        padding: 10px 20px;
+        border: none;
+        background-color: #e74c3c;
+        color: var(--color-background);
+        border-radius: 5px;
+        text-align: center;
+        cursor: pointer;
+    
+        text-align: center;
+    }
+    
+}
