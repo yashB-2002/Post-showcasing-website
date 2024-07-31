@@ -1,4 +1,4 @@
-
+//! apiservice class to interect with other classes
 class APIService extends BaseAPIService {
     async fetchPosts(page = 1, limit = 10, search = '') {
         const url = 'https://dummyjson.com/posts';

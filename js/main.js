@@ -11,11 +11,14 @@ class Main {
         this.isLoading = true;
         console.log(`Fetching posts: page=${page}, limit=${this.limit}, searchQuery=${searchQuery}`);
         console.log(`length of data is ${this.data.length}`);
-        console.trace()
+        console.trace();
+        
         // Fetching posts with current limit
         const data = await apiService.fetchPosts(page, this.limit, searchQuery);
         this.isLoading = false;
-        this.data = data; // Update data with new fetched posts
+
+        // Instead of replacing the data, we append the new data
+        this.data = this.data.concat(data.posts); // Update data with new fetched posts
         this.displayPosts();
         this.hasMore = data.posts.length > 0;
         pagination.updateTotalPages(data.total); // Updating pagination with new total pages
@@ -23,12 +26,13 @@ class Main {
 
     displayPosts() {
         const searchQuery = document.getElementById(commonID.searchInput).value;
-        const filteredPosts = this.data.posts.filter(post =>
+        const filteredPosts = this.data.filter(post =>
             post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             post.body.toLowerCase().includes(searchQuery.toLowerCase())
         );
 
         const postContainer = document.getElementById(commonID.postContainer);
+        postContainer.innerHTML = ''; // Clear existing posts before displaying new ones
 
         filteredPosts.forEach(post => {
             const postDiv = createElement('div', 'post');
@@ -46,9 +50,10 @@ class Main {
 
     async loadPosts() {
         const searchQuery = document.getElementById(commonID.searchInput).value;
-        await this.fetchAndDisplayPosts(pagination.currentPage, searchQuery); 
+        await this.fetchAndDisplayPosts(pagination.currentPage, searchQuery);
     }
 
+    //! infinite scrolling logic
     infiniteScroller() {
         const postContainer = document.getElementById(commonID.postContainer);
         let lastScrollTop = 0;
@@ -71,12 +76,12 @@ class Main {
 
             if (!this.isLoading && this.hasMore) {
                 // Forward scrolling logic
-                if (scrollTop > lastScrollTop && clientHeight + scrollTop >= scrollHeight - 1) {
+                if (clientHeight + scrollTop >= scrollHeight - 1) {
                     pagination.setPage(pagination.currentPage + 1);
                     this.loadPosts();
 
                 }
-                
+
             }
 
             // Backward scrolling logic
@@ -92,6 +97,9 @@ class Main {
         });
     }
 
+
+
+    //! updating the ui of buttons
     updateUIForCurrentPage(page) {
         const pageButtonsContainer = document.getElementById(commonID.pageButtons);
         const buttons = pageButtonsContainer.getElementsByClassName('page-btn');
@@ -104,6 +112,7 @@ class Main {
         }
     }
 
+    //! function to show the scroller to current page position
     scrollToPagePosition(page) {
         const postContainer = document.getElementById(commonID.postContainer);
         if (this.pagePositions.has(page)) {
@@ -118,12 +127,24 @@ class Main {
     init() {
         // Listen for changes to the page limit
         document.getElementById('pageLimit').addEventListener('change', (event) => {
-            this.limit = parseInt(event.target.value, 10);
-            console.log(`Page limit changed to ${this.limit}`);
-            this.pagePositions.clear(); 
-            pagination.setPage(1); 
-            document.getElementById("post-container").innerHTML = '' // before loading post with new limit clear the post with previous meeting
-            this.loadPosts(); // Reload posts with new limit
+            const newLimit = parseInt(event.target.value, 10);
+            if (newLimit === this.limit) return; //! don't need to change anything
+
+            //! calculating the new current page based on the new limit
+            const prevTotalRecords = this.data.length;
+            const prevPage = pagination.currentPage;
+            const newPage = Math.ceil((prevPage * this.limit) / newLimit);
+
+            //! updating limit and reset page positions
+            this.limit = newLimit;
+            this.pagePositions.clear();
+
+            //! adjusting data to show the same number of total records
+            this.data = this.data.slice(0, newPage * this.limit);
+            pagination.setPage(newPage);
+            pagination.updateTotalPages(prevTotalRecords);
+
+            this.displayPosts();
         });
 
         addEventListener(document.getElementById(commonID.searchInput), 'input', () => this.loadPosts());

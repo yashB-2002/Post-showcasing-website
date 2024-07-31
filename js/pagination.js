@@ -42,10 +42,10 @@ class Pagination {
         });
 
         // Add event listener for page limit dropdown change
-        // document.getElementById('pageLimit').addEventListener('change', (event) => {
-        //     this.limit = parseInt(event.target.value, 10);
-        //     main.loadPosts(); // Reload posts with the new limit
-        // });
+        document.getElementById('pageLimit').addEventListener('change', (event) => {
+            this.limit = parseInt(event.target.value, 10);
+            main.loadPosts(); // Reload posts with the new limit
+        });
     }
 
     init(totalRecords) {
